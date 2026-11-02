@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ORBIT-VST3-macOS
-          path: build/ORBIT_artefacts/Release/VST3/ORBIT.vst3
+          path: build/ORBIT_artefacts/Release/VST3/
           if-no-files-found: error
 
       - name: Run tests
