@@ -1,0 +1,37 @@
+name: ORBIT macOS build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Check out ORBIT
+        uses: actions/checkout@v4
+
+      - name: Check out JUCE
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: 8.0.6
+          path: JUCE
+
+      - name: Configure
+        run: >-
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DORBIT_JUCE_SOURCE_DIR=${{ github.workspace }}/JUCE
+
+      - name: Build plugins and tests
+        run: >-
+          cmake --build build --config Release --parallel 2
+          --target ORBIT_VST3 ORBIT_Standalone ORBIT_AU OrbitTests
+
+      - name: Run tests
+        run: ctest --test-dir build -C Release --output-on-failure
