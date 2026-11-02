@@ -113,8 +113,10 @@ void OrbitAudioProcessor::releaseResources()
 
 bool OrbitAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
+    const auto output = layouts.getMainOutputChannelSet();
     return layouts.getMainInputChannelSet().isDisabled()
-        && layouts.getMainOutputChannelSet() == juce::AudioChannelSet::stereo();
+        && (output == juce::AudioChannelSet::mono()
+            || output == juce::AudioChannelSet::stereo());
 }
 
 void OrbitAudioProcessor::processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi)

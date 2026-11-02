@@ -19,3 +19,20 @@ TEST_CASE ("Plugin parameter state survives save and restore")
                                    .getRawParameterValue (OrbitParameterIds::masterGain)->load();
     REQUIRE (restoredValue == Catch::Approx (-43.5f).margin (0.01f));
 }
+
+TEST_CASE ("Plugin accepts mono and stereo output layouts")
+{
+    OrbitAudioProcessor processor;
+    auto layouts = processor.getBusesLayout();
+
+    REQUIRE (processor.isBusesLayoutSupported (layouts));
+
+    layouts.outputBuses.set (0, juce::AudioChannelSet::mono());
+    REQUIRE (processor.isBusesLayoutSupported (layouts));
+
+    layouts.outputBuses.set (0, juce::AudioChannelSet::stereo());
+    REQUIRE (processor.isBusesLayoutSupported (layouts));
+
+    layouts.outputBuses.set (0, juce::AudioChannelSet::quadraphonic());
+    REQUIRE_FALSE (processor.isBusesLayoutSupported (layouts));
+}

@@ -2,9 +2,16 @@
 
 ORBIT is a JUCE instrument plugin. This first milestone establishes VST3 and
 standalone targets, a MIDI-responsive test oscillator, a host-automatable master
-gain parameter, and parameter state save/restore. AU is added automatically on
-macOS. The React editor, sampler engine, and instrument formats are later
-milestones.
+gain parameter, and parameter state save/restore. The instrument supports mono
+and stereo output layouts for broader DAW compatibility. The React editor,
+sampler engine, and instrument formats are later milestones.
+
+On macOS, the VST3 bundle is built at
+`build/ORBIT_artefacts/Release/VST3/ORBIT.vst3`. Install it in
+`~/Library/Audio/Plug-Ins/VST3` and rescan VST3 plugins in LUNA. The CI
+builds a universal arm64/x86_64 bundle, verifies its ad-hoc signature, and
+runs pluginval at strictness level 5. Ad-hoc signing is for validation; public
+macOS distribution requires Developer ID signing and notarization.
 
 The project uses the JUCE source tree in its parent directory when available;
 otherwise it looks for an installed JUCE package. From this directory,

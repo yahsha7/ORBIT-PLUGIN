@@ -16,9 +16,6 @@ else()
 endif()
 
 set(ORBIT_PLUGIN_FORMATS VST3 Standalone)
-if(APPLE)
-    list(APPEND ORBIT_PLUGIN_FORMATS AU)
-endif()
 
 juce_add_plugin(ORBIT
     COMPANY_NAME "Orbit Instruments"

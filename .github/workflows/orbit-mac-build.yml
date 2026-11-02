@@ -26,15 +26,34 @@ jobs:
         run: >-
           cmake -S . -B build
           -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
           -DORBIT_JUCE_SOURCE_DIR=${{ github.workspace }}/JUCE
 
       - name: Build plugins and tests
         run: >-
           cmake --build build --config Release --parallel 2
-          --target ORBIT_VST3 ORBIT_Standalone ORBIT_AU OrbitTests
+          --target ORBIT_VST3 ORBIT_Standalone OrbitTests
 
-      - name: Sign VST3 bundle
-        run: codesign --force --deep --sign - build/ORBIT_artefacts/Release/VST3/ORBIT.vst3
+      - name: Sign and verify VST3 bundle
+        run: |
+          codesign --force --deep --sign - build/ORBIT_artefacts/Release/VST3/ORBIT.vst3
+          codesign --verify --deep --strict build/ORBIT_artefacts/Release/VST3/ORBIT.vst3
+
+      - name: Download pluginval
+        run: |
+          curl --fail --location --retry 3 \
+            https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_macOS.zip \
+            --output "$RUNNER_TEMP/pluginval.zip"
+          ditto -x -k "$RUNNER_TEMP/pluginval.zip" "$RUNNER_TEMP/pluginval"
+
+      - name: Validate VST3 compatibility
+        run: |
+          "$RUNNER_TEMP/pluginval/pluginval.app/Contents/MacOS/pluginval" \
+            --strictness-level 5 \
+            --validate-in-process \
+            --output-dir "$RUNNER_TEMP/pluginval-logs" \
+            build/ORBIT_artefacts/Release/VST3/ORBIT.vst3
 
       - name: Upload VST3 artifact
         uses: actions/upload-artifact@v4
